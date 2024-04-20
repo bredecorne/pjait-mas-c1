@@ -8,9 +8,9 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 import static org.example.Utils.checkIfNull;
-import static org.example.Utils.checkIfStringIsEmptyOrNull;
 
 public class Project implements Serializable {
     private String name;
@@ -55,7 +55,7 @@ public class Project implements Serializable {
     }
 
     public void setName(String name) {
-        checkIfStringIsEmptyOrNull(name);
+        checkIfNull(name);
         this.name = name;
     }
 
@@ -103,7 +103,7 @@ public class Project implements Serializable {
     }
     
     public void addTechnology(String technology) {
-        checkIfStringIsEmptyOrNull(technology);
+        checkIfNull(technology);
         technologies.add(technology);
     }
     
@@ -148,16 +148,32 @@ public class Project implements Serializable {
                 ", technologies=" + technologies +
                 '}';
     }
-    
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Project project = (Project) o;
+        return Objects.equals(name, project.name) && Objects.equals(description, project.description) && Objects.equals(budget, project.budget) && Objects.equals(startDate, project.startDate) && Objects.equals(endDate, project.endDate) && Objects.equals(technologies, project.technologies);
+    }
+
     public static void removeFromExtent(Project project) {
         extent.remove(project);
     }
     
-    public static void writeExtent(ObjectOutputStream out) throws IOException {
-        out.writeObject(extent);
+    public static void writeExtent(ObjectOutputStream out) {
+        try {
+            out.writeObject(extent);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
     
-    public static void readExtent(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        extent = (ArrayList<Project>) in.readObject();
+    public static void readExtent(ObjectInputStream in) {
+        try {
+            extent = (ArrayList<Project>) in.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

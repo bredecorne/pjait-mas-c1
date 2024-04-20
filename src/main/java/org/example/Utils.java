@@ -14,12 +14,11 @@ public class Utils {
             if (value == null) {
                 throw new NullPointerException("Null value is not allowed.");
             }
-        }
-    }
-    
-    public static void checkIfStringIsEmptyOrNull(String string) {
-        if (string == null || string.isEmpty()) {
-            throw new IllegalArgumentException("Empty string is not allowed.");
+            if (value instanceof String) {
+                if (((String) value).isEmpty()) {
+                    throw new NullPointerException("Empty value is not allowed.");
+                }
+            }
         }
     }
 }

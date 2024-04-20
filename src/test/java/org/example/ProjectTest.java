@@ -3,6 +3,7 @@ package org.example;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.*;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.util.Date;
@@ -41,6 +42,19 @@ class ProjectTest {
                 () -> assertEquals(endDate, project.getEndDate()),
                 () -> assertEquals(technologies, project.getTechnologies())
         );
+    }
+    
+    @Test
+    void projectThrowsExceptionWhenNameIsEmpty() throws ParseException {
+        String description = "Description";
+        BigDecimal budget = new BigDecimal("35122.21");
+        Date startDate = createDate("2024-04-20");
+        Date endDate = createDate("2024-04-30");
+        List<String> technologies = List.of("Java", "Spring");
+
+        assertThrows(NullPointerException.class, () -> new Project(
+                "", description, null, startDate, endDate, technologies
+        ));
     }
 
     @Test
@@ -120,5 +134,35 @@ class ProjectTest {
         assertEquals(
                 List.of(p1, p2, p3), Project.getExtent()
         );
+    }
+
+    @Test
+    void projectIsSuccessfullySerializedToFile() throws ParseException, IOException {
+        Project p1 = new Project(
+                "Example", "Description", new BigDecimal("35122.21"),
+                createDate("2024-04-20"), createDate("2024-04-30"),
+                List.of("Java", "Spring")
+        );
+
+        Project p2 = new Project(
+                "Example", "Description", new BigDecimal("35122.21"),
+                createDate("2024-04-20"), createDate("2024-04-30"),
+                List.of("Java", "Spring", "Python", "SQL")
+        );
+
+        Project p3 = new Project(
+                "Example", "Description", new BigDecimal("35122.21"),
+                createDate("2024-04-20"), createDate("2024-04-30"),
+                List.of("Python", "SQL")
+        );
+
+        Project.writeExtent(new ObjectOutputStream(new FileOutputStream("project_extent.txt")));
+        var extent = Project.getExtent();
+        
+        tearDown();
+
+        Project.readExtent(new ObjectInputStream(new FileInputStream("project_extent.txt")));
+
+        assertIterableEquals(extent, Project.getExtent());
     }
 }
