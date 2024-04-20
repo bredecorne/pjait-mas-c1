@@ -1,5 +1,8 @@
 package org.example;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -7,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import static org.example.Utils.checkIfNull;
+import static org.example.Utils.checkIfStringIsEmptyOrNull;
 
 public class Project implements Serializable {
     private String name;
@@ -17,7 +21,7 @@ public class Project implements Serializable {
     private List<String> technologies;
 
     private static long maximumDuration;
-    private static final ProjectExtent EXTENT = new ProjectExtent();
+    private static ProjectExtent extent = new ProjectExtent();
 
     public Project(String name, String description, BigDecimal budget, Date startDate, Date endDate,
                    List<String> technologies) {
@@ -30,7 +34,7 @@ public class Project implements Serializable {
         this.endDate = endDate;
         this.technologies = technologies;
         
-        EXTENT.addProject(this);
+        extent.addProject(this);
     }
 
     public Project(String name, BigDecimal budget, Date startDate, Date endDate,
@@ -43,7 +47,7 @@ public class Project implements Serializable {
         this.endDate = endDate;
         this.technologies = technologies;
         
-        EXTENT.addProject(this);
+        extent.addProject(this);
     }
 
     public String getName() {
@@ -51,7 +55,7 @@ public class Project implements Serializable {
     }
 
     public void setName(String name) {
-        checkIfNull(name);
+        checkIfStringIsEmptyOrNull(name);
         this.name = name;
     }
 
@@ -97,14 +101,9 @@ public class Project implements Serializable {
     public List<String> getTechnologies() {
         return technologies;
     }
-
-    public void setTechnologies(List<String> technologies) {
-        checkIfNull(technologies);
-        this.technologies = technologies;
-    }
     
     public void addTechnology(String technology) {
-        checkIfNull(technology);
+        checkIfStringIsEmptyOrNull(technology);
         technologies.add(technology);
     }
     
@@ -125,12 +124,12 @@ public class Project implements Serializable {
     }
     
     public static List<Project> getExtent() {
-        return new ArrayList<>(EXTENT.getProjects());
+        return new ArrayList<>(extent.getProjects());
     }
     
-    public static List<Project> findProjectsUsingTechnology(List<Project> projectExtent, String technology) {
+    public static List<Project> findProjectsUsingTechnology(String technology) {
         List<Project> matchingProjects = new ArrayList<>();
-        for (Project project : projectExtent) {
+        for (Project project : extent.getProjects()) {
             if (project.getTechnologies().contains(technology)) {
                 matchingProjects.add(project);
             }
@@ -148,5 +147,13 @@ public class Project implements Serializable {
                 ", endDate=" + endDate +
                 ", technologies=" + technologies +
                 '}';
+    }
+    
+    public static void writeExtent(ObjectOutputStream out) throws IOException {
+        out.writeObject(extent);
+    }
+    
+    public static void readExtent(ObjectInputStream in) throws IOException, ClassNotFoundException {
+        extent = (ProjectExtent) in.readObject();
     }
 }

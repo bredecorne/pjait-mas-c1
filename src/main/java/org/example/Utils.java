@@ -16,4 +16,10 @@ public class Utils {
             }
         }
     }
+    
+    public static void checkIfStringIsEmptyOrNull(String string) {
+        if (string == null || string.isEmpty()) {
+            throw new IllegalArgumentException("Empty string is not allowed.");
+        }
+    }
 }
