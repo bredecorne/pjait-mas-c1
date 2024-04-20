@@ -1,5 +1,6 @@
 package org.example;
 
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -11,6 +12,14 @@ import static org.example.Utils.createDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 class ProjectTest {
+
+    @AfterEach
+    void tearDown() {
+        for (Project project : Project.getExtent()) {
+            Project.removeFromExtent(project);
+        }
+    }
+
     @Test
     void projectCreatesSuccessfullyWhenAllParametersAreProvidedAndValid() throws ParseException {
         String name = "Example";

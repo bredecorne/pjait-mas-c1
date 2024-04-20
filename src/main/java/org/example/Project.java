@@ -21,7 +21,7 @@ public class Project implements Serializable {
     private List<String> technologies;
 
     private static long maximumDuration;
-    private static ProjectExtent extent = new ProjectExtent();
+    private static List<Project> extent = new ArrayList<>();
 
     public Project(String name, String description, BigDecimal budget, Date startDate, Date endDate,
                    List<String> technologies) {
@@ -34,7 +34,7 @@ public class Project implements Serializable {
         this.endDate = endDate;
         this.technologies = technologies;
         
-        extent.addProject(this);
+        extent.add(this);
     }
 
     public Project(String name, BigDecimal budget, Date startDate, Date endDate,
@@ -47,7 +47,7 @@ public class Project implements Serializable {
         this.endDate = endDate;
         this.technologies = technologies;
         
-        extent.addProject(this);
+        extent.add(this);
     }
 
     public String getName() {
@@ -124,12 +124,12 @@ public class Project implements Serializable {
     }
     
     public static List<Project> getExtent() {
-        return new ArrayList<>(extent.getProjects());
+        return new ArrayList<>(extent);
     }
     
     public static List<Project> findProjectsUsingTechnology(String technology) {
         List<Project> matchingProjects = new ArrayList<>();
-        for (Project project : extent.getProjects()) {
+        for (Project project : extent) {
             if (project.getTechnologies().contains(technology)) {
                 matchingProjects.add(project);
             }
@@ -149,11 +149,15 @@ public class Project implements Serializable {
                 '}';
     }
     
+    public static void removeFromExtent(Project project) {
+        extent.remove(project);
+    }
+    
     public static void writeExtent(ObjectOutputStream out) throws IOException {
         out.writeObject(extent);
     }
     
     public static void readExtent(ObjectInputStream in) throws IOException, ClassNotFoundException {
-        extent = (ProjectExtent) in.readObject();
+        extent = (ArrayList<Project>) in.readObject();
     }
 }
